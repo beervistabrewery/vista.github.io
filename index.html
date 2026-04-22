@@ -16,14 +16,16 @@
       /* % ではなく px で固定幅を指定することが最重要です。これによりiframeの内部スクロールを防ぎ、画像を埋め込んだようにブラウザ全体が縮小されます。 */
       width: 1024px;
       margin: 0 auto; /* PC閲覧時などのための中央寄せ */
-      height: 100vh;
-      height: 100dvh;
+      /* iframe内の独自スクロールを廃止し、全体を画像としてスクロールさせるための高さ */
+      height: 1600px;
     }
     iframe {
       width: 100%;
       height: 100%;
       border: none;
       display: block;
+      /* 非常に重要：iframeへの指のタッチ判定を無効化し、ピンチ縮小やスクロールを必ず親ブラウザに処理させます */
+      pointer-events: none;
     }
   </style>
 </head>
