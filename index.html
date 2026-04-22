@@ -2,33 +2,23 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <!-- スマホでもPCでもメニュー全体が収まるように表示領域を固定し、ピンチアウトでの手動拡大を許可します -->
   <meta name="viewport" content="width=1024, user-scalable=yes">
   <title>スプレッドシート表示</title>
   <style>
-    /* ページ全体の余白をなくし、背景色を設定 */
+    /* Flexboxを解除し、純粋なブロックレイアウトにすることでスマホでの左見切れを防ぎます */
     body {
       margin: 0;
       padding: 0;
-      background-color: #ffffff; /* 境界をなくすため白で統一 */
-      display: flex;
-      justify-content: center;
-      min-height: 100vh;
-      font-family: sans-serif;
+      background-color: #ffffff;
     }
     
-    /* 
-      スプレッドシートを表示する枠線の設定 
-      viewportの1024pxに合わせて幅を100% (最大1024px相当) に設定します
-    */
     .sheet-wrapper {
-      width: 100%;
-      max-width: 1024px;
-      height: 100vh; /* ブラウザの高さいっぱいに表示 */
-      height: 100dvh; /* スマホ特有のアドレスバーを考慮 */
-      overflow: hidden;
+      /* % ではなく px で固定幅を指定することが最重要です。これによりiframeの内部スクロールを防ぎ、画像を埋め込んだようにブラウザ全体が縮小されます。 */
+      width: 1024px;
+      margin: 0 auto; /* PC閲覧時などのための中央寄せ */
+      height: 100vh;
+      height: 100dvh;
     }
-    /* iframe本体からの余分な枠線を消去 */
     iframe {
       width: 100%;
       height: 100%;
@@ -39,23 +29,21 @@
 </head>
 <body>
   <div class="sheet-wrapper">
-    <!-- 指定されたシートのみを表示するためのパラメータを設定しています -->
     <iframe 
       id="spreadsheet-frame" 
       src="https://docs.google.com/spreadsheets/d/1paBnR8fgU0v_Gz5J96F5S5EnFHNQ2qzNvC3H1e_k4tY/htmlembed?gid=1218865702&single=true&widget=false&chrome=false">
     </iframe>
   </div>
   <script>
-    // 自動更新のためのJavaScriptスクリプト
     const iframe = document.getElementById('spreadsheet-frame');
-    const REFRESH_INTERVAL = 5 * 60 * 1000; // 5分ごと
+    const REFRESH_INTERVAL = 5 * 60 * 1000;
     setInterval(() => {
       try {
         const currentUrl = new URL(iframe.src, window.location.href);
         currentUrl.searchParams.set('timestamp', new Date().getTime());
         iframe.src = currentUrl.toString();
       } catch (error) {
-        console.error("更新処理中にエラーが発生しました:", error);
+        console.error("更新エラー:", error);
       }
     }, REFRESH_INTERVAL);
   </script>
