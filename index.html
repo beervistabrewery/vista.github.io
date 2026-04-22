@@ -21,6 +21,19 @@
        */
       --sheet-height: 1600px;
     }
+    <meta charset="UTF-8">
+    <!-- スマホで画面幅に収め、ピンチズームを機能させるための設定 -->
+    <!-- スプレッドシートの実際の横幅に合わせて content="width=1000" の数値を調整してください -->
+    <meta name="viewport" content="width=1000, user-scalable=yes">
+    <title>スプレッドシート表示</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #f8f9fa; /* 余白部分の背景色 */
+        }
     body {
       margin: 0;
       padding: 0;
@@ -32,6 +45,12 @@
       margin: 0 auto; 
       height: var(--sheet-height);
     }
+        .sheet-container {
+            width: 100%;
+            height: 100vh; /* 画面全体の高さを確保 */
+            -webkit-overflow-scrolling: touch; /* iOS端末でのスクロールを滑らかにする設定 */
+            overflow-y: auto;
+        }
     iframe {
       width: 100%;
       height: 100%;
@@ -41,6 +60,13 @@
       pointer-events: none;
     }
   </style>
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+    </style>
 </head>
 <body>
   <div class="sheet-wrapper">
@@ -73,5 +99,10 @@
       }
     }, REFRESH_INTERVAL);
   </script>
+    <div class="sheet-container">
+        <!-- src属性に取得した公開用URLを指定します -->
+        <!-- 末尾に ?widget=false&headers=false&chrome=false を付与することで、スプレッドシートの不要なUI（ツールバーや行・列番号など）を非表示にできます -->
+        <iframe src="https://docs.google.com/spreadsheets/d/1paBnR8fgU0v_Gz5J96F5S5EnFHNQ2qzNvC3H1e_k4tY/pubhtml?widget=false&amp;headers=false&amp;chrome=false"></iframe>
+    </div>
 </body>
 </html>
