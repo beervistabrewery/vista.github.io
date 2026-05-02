@@ -1,9 +1,13 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>BEER VISTA BREWERY MENU</title>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  />
+
+  <title>BEER VISTA TAP MENU</title>
 
   <style>
     * {
@@ -11,7 +15,8 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    html, body {
+    html,
+    body {
       margin: 0;
       padding: 0;
       width: 100%;
@@ -20,169 +25,135 @@
       overflow-x: hidden;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
+      font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue",
+        "Segoe UI", Roboto, "Noto Sans JP", sans-serif;
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans JP", sans-serif;
+      color: #fff;
     }
 
-    .sheet-holder {
+    .app {
       width: 100%;
       min-height: 100vh;
       background: #111;
+      overflow-x: hidden;
     }
 
-    .sheet-wrap {
-      position: relative;
-      width: 1200px;
-      height: 26000px;
-      margin: 0 auto;
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      width: 100%;
+      padding: 10px 14px;
+      background: rgba(17, 17, 17, 0.92);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .header-title {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      line-height: 1.4;
+    }
+
+    .header-sub {
+      margin: 2px 0 0;
+      font-size: 11px;
+      color: #aaa;
+      line-height: 1.4;
+    }
+
+    .sheet-section {
+      width: 100%;
+      overflow: hidden;
+      background: #111;
+    }
+
+    /*
+      Googleスプレッドシートの公開HTMLはPC幅で描画されやすいため、
+      iframe全体をスマホ幅に合わせて縮小表示します。
+
+      表示が小さい場合は 1200 → 1000 → 900 のように下げてください。
+    */
+    .sheet-scale-wrap {
+      --sheet-width: 1200;
+      --sheet-height: 14000;
+      --scale: calc(100vw / var(--sheet-width));
+
+      width: calc(var(--sheet-width) * 1px);
+      height: calc(var(--sheet-height) * 1px);
+
+      transform: scale(var(--scale));
       transform-origin: top left;
+      background: #fff;
+    }
+
+    .sheet-section {
+      height: calc(14000px * (100vw / 1200));
     }
 
     .sheet-frame {
-      position: absolute;
-      top: 0;
-      left: 0;
+      display: block;
       width: 1200px;
-      height: 26000px;
+      height: 14000px;
       border: 0;
       background: #fff;
-      display: block;
     }
 
-    .top-mask {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 1200px;
-      height: 44px;
-      background: #fff;
-      z-index: 5;
-      pointer-events: none;
+    /*
+      タブレット・PCではスマホプレビュー幅に固定。
+      QRコードやSNSリンクから開いたときの見た目を一定にします。
+    */
+    @media (min-width: 520px) {
+      .app {
+        max-width: 430px;
+        margin: 0 auto;
+        box-shadow: 0 0 40px rgba(0, 0, 0, 0.35);
+      }
+
+      .sheet-scale-wrap {
+        --scale: calc(430 / var(--sheet-width));
+      }
+
+      .sheet-section {
+        height: calc(14000px * (430 / 1200));
+      }
     }
 
-    .controls {
-      position: fixed;
-      right: 12px;
-      bottom: 12px;
-      z-index: 20;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .btn {
-      width: 44px;
-      height: 44px;
-      border: none;
-      border-radius: 999px;
-      background: rgba(0,0,0,0.72);
-      color: #fff;
-      font-size: 22px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-    }
-
-    .fallback {
-      display: none;
-      padding: 24px;
-      color: #fff;
-      text-align: center;
-    }
-
-    .fallback a {
-      display: inline-block;
-      margin-top: 16px;
-      padding: 14px 20px;
-      border-radius: 999px;
-      background: #fff;
-      color: #111;
-      text-decoration: none;
-      font-weight: 700;
+    /*
+      Instagram内ブラウザなどで高さ計算が不安定な場合の保険。
+      画面下に余白を少し足して、最下部が隠れにくくします。
+    */
+    .bottom-space {
+      height: env(safe-area-inset-bottom);
+      min-height: 24px;
+      background: #111;
     }
   </style>
 </head>
 
 <body>
-  <div id="sheetHolder" class="sheet-holder">
-    <div id="sheetWrap" class="sheet-wrap">
-      <iframe
-        id="sheetFrame"
-        class="sheet-frame"
-        src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRCU8XLZMT2yBGxs1sQxz1NmSaX5fhDGPFDFMwrbSLWl3mnvWwRjhAIpxTTbRC98dQcNVeZH8QjazkN/pubhtml?gid=1218865702&single=true&widget=false&headers=false&chrome=false"
-        loading="eager"
-        referrerpolicy="no-referrer">
-      </iframe>
+  <main class="app">
+    <header class="header">
+      <h1 class="header-title">BEER VISTA TAP MENU</h1>
+      <p class="header-sub">Scroll to view the menu</p>
+    </header>
 
-      <div class="top-mask"></div>
-    </div>
-  </div>
+    <section class="sheet-section" aria-label="Tap menu">
+      <div class="sheet-scale-wrap">
+        <iframe
+          class="sheet-frame"
+          src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRCU8XLZMT2yBGxs1sQxz1NmSaX5fhDGPFDFMwrbSLWl3mnvWwRjhAIpxTTbRC98dQcNVeZH8QjazkN/pubhtml?gid=1218865702&single=true&widget=false&headers=false&chrome=false"
+          loading="eager"
+        ></iframe>
+      </div>
+    </section>
 
-  <div class="controls">
-    <button class="btn" id="zoomIn">＋</button>
-    <button class="btn" id="zoomOut">－</button>
-    <button class="btn" id="zoomReset">⟲</button>
-  </div>
-
-  <div id="fallback" class="fallback">
-    <p>メニューを表示できない場合は、下のボタンから開いてください。</p>
-    <a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vRCU8XLZMT2yBGxs1sQxz1NmSaX5fhDGPFDFMwrbSLWl3mnvWwRjhAIpxTTbRC98dQcNVeZH8QjazkN/pubhtml?gid=1218865702&single=true&widget=false&headers=false&chrome=false" target="_blank">
-      メニューを開く
-    </a>
-  </div>
-
-  <script>
-    const BASE_WIDTH = 1200;
-    const BASE_HEIGHT = 26000;
-    const MIN_SCALE = 0.45;
-    const MAX_SCALE = 3.0;
-
-    const sheetHolder = document.getElementById('sheetHolder');
-    const sheetWrap = document.getElementById('sheetWrap');
-
-    let scale = 1;
-    let fitScale = 1;
-
-    function clamp(value, min, max) {
-      return Math.min(max, Math.max(min, value));
-    }
-
-    function updateLayout() {
-      sheetWrap.style.transform = `scale(${scale})`;
-      sheetHolder.style.height = `${BASE_HEIGHT * scale}px`;
-    }
-
-    function fitToWidth() {
-      fitScale = clamp(window.innerWidth / BASE_WIDTH, MIN_SCALE, 1);
-      scale = fitScale;
-      updateLayout();
-    }
-
-    window.addEventListener('load', fitToWidth);
-    window.addEventListener('resize', () => {
-      const wasFit = Math.abs(scale - fitScale) < 0.05;
-      fitScale = clamp(window.innerWidth / BASE_WIDTH, MIN_SCALE, 1);
-
-      if (wasFit) {
-        scale = fitScale;
-      }
-
-      updateLayout();
-    });
-
-    document.getElementById('zoomIn').addEventListener('click', () => {
-      scale = clamp(scale * 1.15, MIN_SCALE, MAX_SCALE);
-      updateLayout();
-    });
-
-    document.getElementById('zoomOut').addEventListener('click', () => {
-      scale = clamp(scale / 1.15, MIN_SCALE, MAX_SCALE);
-      updateLayout();
-    });
-
-    document.getElementById('zoomReset').addEventListener('click', () => {
-      fitToWidth();
-    });
-  </script>
+    <div class="bottom-space"></div>
+  </main>
 </body>
 </html>
